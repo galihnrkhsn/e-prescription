@@ -20,7 +20,7 @@
                 <tr>
                     <th>Obat</th>
                     <th>Qty</th>
-                    <th>Signa</th>
+                    <th>Resep</th>
                 </tr>
             </thead>
             <tbody>
