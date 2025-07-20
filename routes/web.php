@@ -17,6 +17,7 @@ Route::group(['prefix' => 'resep', 'middleware' => ['auth', 'verified']], functi
     route::get('/', [ResepController::class, 'index'])->name('resep.index');
     route::post('/', [ResepController::class, 'store'])->name('resep.store');
     route::get('/{id}', [ResepController::class, 'show'])->name('resep.show');
+    route::get('/{id}/print', [ResepController::class, 'print'])->name('resep.print');
 });
 
 require __DIR__.'/settings.php';

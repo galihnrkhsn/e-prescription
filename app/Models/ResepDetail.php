@@ -31,6 +31,6 @@ class ResepDetail extends Model
     }
 
     public function racikan() {
-        return $this->belongsTo(Racikan::class, 'racikan_id');
+        return $this->belongsTo(Racikan::class, 'racikan_id', 'racikan_id');
     }
 }

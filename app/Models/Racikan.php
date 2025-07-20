@@ -24,6 +24,6 @@ class Racikan extends Model
     }
 
     public function details() {
-        return $this->hasMany(ResepDetail::class, 'racikan_id');
+        return $this->hasMany(ResepDetail::class, 'racikan_id', 'racikan_id');
     }
 }

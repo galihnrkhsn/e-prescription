@@ -8,6 +8,7 @@ use App\Models\Racikan;
 use App\Models\Resep;
 use App\Models\ResepDetail;
 use App\Models\Signa;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -31,10 +32,22 @@ class ResepController extends Controller
     }
 
     public function show($id) {
-        $resep = Resep::with(['details.obatalkes', 'details.signa', 'racikans.items.obatalkes'])->findOrFail($id);
+        $reseps = Resep::get();
+        $signas = Signa::where('is_deleted', 0)->get();
+        $obats  = Obatalkes::where([
+            ['is_deleted', 0],
+            ['is_active', '=', 1]
+        ])->get();
+
+        $resepDetail = Resep::with(['details.obatalkes', 'details.signa', 'racikans.details.obatalkes', 'racikans.signa'])
+            ->where('resep_id', $id)
+            ->firstOrFail();
 
         return Inertia::render('Resep/Index', [
-            'resepDetail' => $resep
+            'reseps' => $reseps,
+            'signas' => $signas,
+            'obats' => $obats,
+            'resepDetail' => $resepDetail
         ]);
     }
 
@@ -143,5 +156,18 @@ class ResepController extends Controller
 
             return back()->withErrors(['error' => $e->getMessage()]);
         }
+    }
+
+    public function print($id) {
+        $resep = Resep::with([
+            'details.obatalkes',
+            'details.signa',
+            'racikans.details.obatalkes',
+            'racikans.signa'
+        ])->where('resep_id', $id)->firstOrFail();
+
+        $pdf = Pdf::loadView('pdf.resep', compact('resep'))->setPaper('A4', 'potrait');
+
+        return $pdf->stream("resep-{$resep->resep_id}.pdf");
     }
 }
