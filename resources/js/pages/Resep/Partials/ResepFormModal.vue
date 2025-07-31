@@ -9,6 +9,7 @@
     }>()
 
     const emit = defineEmits(['close', 'submit'])
+    let isSubmitting = false
 
     const form = reactive({
         nama_resep: '',
@@ -53,10 +54,15 @@
     }
 
     function submit() {
+        if (isSubmitting) return
+
         if (!isQtyValid()) return
+
+        isSubmitting = true
 
         router.post('/resep', form, {
             onSuccess: () => {
+                isSubmitting = false
                 router.visit('/resep')
             },
             onError: (errors) => {
@@ -64,6 +70,9 @@
                     alert(errors[field])
                     break
                 }
+            },
+            onFinish: () => {
+                isSubmitting = false
             }
         })
     }
@@ -102,7 +111,7 @@
             <h2 class="text-2xl font-semibold mb-4">Tambah Resep</h2>
             <div class="mb-4">
                 <label class="block font-medium mb-1">Nama Resep</label>
-                <input v-model="form.nama_resep" type="text" placeholder="Nama Resep" class="w-full border px-3 py-2 rounded" />
+                <input v-model="form.nama_resep" type="text" placeholder="Nama Resep" required class="w-full border px-3 py-2 rounded" />
             </div>
             <div class="mb-6">
                 <h3 class="font-semibold mb-2">Obat Non Racikan</h3>
@@ -149,7 +158,14 @@
             </div>
             <div class="flex justify-end gap-2 pt-4 border-t">
                 <button @click="$emit('close')" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer">Batal</button>
-                <button @click="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer">Simpan</button>
+                <button
+                    @click="submit"
+                    :disabled="isSubmitting"
+                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <span v-if="isSubmitting">Menyimpan...</span>
+                    <span v-else>Simpan</span>
+                </button>
             </div>
         </div>
     </div>
